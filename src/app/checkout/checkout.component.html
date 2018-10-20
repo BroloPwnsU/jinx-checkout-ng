@@ -1,0 +1,48 @@
+
+<div *ngIf="amazonPayLoggedIn">
+	<p>
+	  <button (click)="showAmazonPay();">Show Address Book Widgit</button>
+	</p>
+
+	<p>
+		<button (click)="logoutAmazonPay()">Logout</button>
+	</p>
+
+	<div id="addressBookWidgetDiv"></div>
+	<div id="walletWidgetDiv"></div>
+
+	<div *ngIf="paymentSelected && shippingEstimate != null">
+		<p>Order Ref ID: {{shippingEstimate.orderReferenceId}}</p>
+		<p>Payment Selected</p>
+		<p>Address Selected</p>
+		<p>Shipping Options</p>
+		<ul>
+			<li *ngFor="let method of shippingEstimate.methods">
+				<span>{{method.name}} - {{method.dateRange}}</span>
+				<button (click)="selectShippingMethod(method)">{{method.price | currency}}</button>
+			</li>
+		</ul>
+	</div>
+
+	<div *ngIf="order.shippingMethod != null">
+		<hr />
+		<h3>Confirm Your Order</h3>
+		<p>Shipping: {{order.shippingMethod.price}} ({{order.shippingMethod.name}})</p>
+		<p>Items: {{order.getCount()}} for {{order.subtotal | currency}}
+		<p>Tax: {{order.tax | currency}}</p>
+		<p>Discounts: {{order.discounts | currency}}</p>
+		<p>Total: {{order.total | currency}}</p>
+		<p><button (click)="confirmOrder()">Place Order</button>
+	</div>
+
+</div>
+<div *ngIf="amazonPayLoggedIn == false">
+	<p>
+	  <button (click)="showAmazonPay();">Show Amazon Pay Login Button</button>
+	</p>
+	<div id="AmazonPayButton"></div>
+</div>
+
+<p>
+	<a routerLink="/start" routerLinkActive="active">Start Over</a> 
+</p>

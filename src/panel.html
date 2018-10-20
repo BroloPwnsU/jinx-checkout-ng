@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+	<script type='text/javascript'>
+	    window.onAmazonLoginReady = function() {
+	    	amazon.Login.setClientId('amzn1.application-oa2-client.f0894cb4347b4eeb950b4b96f3e746e7');
+        amazon.Login.setUseCookie(true);
+	    };
+	    window.onAmazonPaymentsReady = function() {
+	    	  if (window.angularComponentRef != null)
+	        {
+	        	window.angularComponentRef.enableAmazonPay(true);
+	        }
+	    };
+	</script>
+	
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0"/>
+	<meta charset="utf-8">
+	<title>BETA - J!NX Shop Twitch Extension</title>
+	<base href="/">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+
+	<script async="async" src='https://static-na.payments-amazon.com/OffAmazonPayments/us/sandbox/js/Widgets.js'>
+	</script>
+
+
+</head>
+<body>
+
+	<app-root></app-root>
+<!--
+<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+-->
+<!-- TODO:  remove the following script tag before submitting to Twitch for testing or production. -->
+<!--<script src="https://localhost.rig.twitch.tv:3000/twitch-ext.js"></script>
+
+<script>
+	let token, userId;
+
+	const twitch = window.Twitch.ext;
+
+	twitch.onContext((context) => {
+	  twitch.rig.log(context);
+	});
+
+	twitch.onAuthorized((auth) => {
+	  token = auth.token;
+	  userId = auth.userId;
+	});
+</script>
+-->
+
+</body>
+</html>
