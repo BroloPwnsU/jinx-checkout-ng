@@ -1,7 +1,7 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 
-import { MessageService } from '../message.service';
-import { AmazonPayService } from '../amazon-pay.service';
+import { MessageService } from '../services/message.service';
+import { AmazonPayService } from '../services/amazon-pay.service';
 
 declare var OffAmazonPayments: any;
 declare var amazon: any;

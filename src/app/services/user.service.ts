@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 
 import {MessageService} from './message.service';
 
-import {Order} from './order';
-import {OrderItem} from './order-item';
+import {Order} from '../classes/order';
+import {OrderItem} from '../classes/order-item';
 
 @Injectable({
   providedIn: 'root'
