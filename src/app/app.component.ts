@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 
-import { MessageService } from './message.service';
-import { AmazonPayService } from './amazon-pay.service';
+import { MessageService } from './services/message.service';
+import { AmazonPayService } from './services/amazon-pay.service';
 
 @Component({
   selector: 'app-root',
@@ -28,13 +28,13 @@ export class AppComponent implements OnInit {
 		private messageService: MessageService,
 		private amazonPayService: AmazonPayService
 		)
-	{		
+	{
 	    (<any>window).angularComponentRef = {
 	      zone: this.zone, 
 	      enableAmazonPay: (value) => this.enableAmazonPay(value), 
 	      component: this
 	    };
-	    console.log('reference added');
+	    this.messageService.add('reference added');
 	}
 
 	ngOnInit(): void {

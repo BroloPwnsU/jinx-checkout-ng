@@ -1,16 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import {Router, ActivatedRoute, Params} from '@angular/router';
 
-import {MessageService} from '../message.service';
-import {FulfillmentService} from '../fulfillment.service';
-import {UserService} from '../user.service'; 
-import {AmazonPayService} from '../amazon-pay.service';
-import {CartService} from '../cart.service';
+import {MessageService} from '../services/message.service';
+import {FulfillmentService} from '../services/fulfillment.service';
+import {UserService} from '../services/user.service'; 
+import {AmazonPayService} from '../services/amazon-pay.service';
+import {CartService} from '../services/cart.service';
 import {SummaryService} from '../services/summary.service';
 
-import {ShippingEstimate} from '../shipping-estimate';
-import {ShippingMethod} from '../shipping-method';
-import {Order} from '../order';
+import {ShippingEstimate} from '../classes/shipping-estimate';
+import {ShippingMethod} from '../classes/shipping-method';
+import {Order} from '../classes/order';
 
 
 declare var OffAmazonPayments: any;

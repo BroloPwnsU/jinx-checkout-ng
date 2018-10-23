@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import {SummaryService} from '../services/summary.service';
 
-import {OrderSummary} from '../order-summary';
+import {OrderSummary} from '../classes/order-summary';
 
 @Component({
   selector: 'app-checkout-complete',

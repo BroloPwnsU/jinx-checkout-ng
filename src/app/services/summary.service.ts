@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import {MessageService} from '../message.service';
+import {MessageService} from '../services/message.service';
 
-import {OrderSummary} from '../order-summary';
+import {OrderSummary} from '../classes/order-summary';
 
 @Injectable({
   providedIn: 'root'
