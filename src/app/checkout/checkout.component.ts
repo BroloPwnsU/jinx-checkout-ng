@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import {Router, ActivatedRoute, Params} from '@angular/router';
+import {Observable, Subject} from 'rxjs';
 
 import {MessageService} from '../services/message.service';
 import {FulfillmentService} from '../services/fulfillment.service';
 import {UserService} from '../services/user.service'; 
 import {AmazonPayService} from '../services/amazon-pay.service';
-import {CartService} from '../services/cart.service';
-import {SummaryService} from '../services/summary.service';
+import {OrderService} from '../services/order.service';
 
-import {ShippingEstimate} from '../classes/shipping-estimate';
 import {ShippingMethod} from '../classes/shipping-method';
 import {Order} from '../classes/order';
 
@@ -25,32 +24,37 @@ export class CheckoutComponent implements OnInit {
 
 	popupAmazonPay: boolean = false;
 
-	userToken: string;
+	preLoadComplete: boolean = false;
+	
+	//Error stuff
+	isError: boolean = false;
+	errorMessage: string = "";
+	defaultCriticalMessage: string = "Checkout has suffered a critical error. Please close the Checkout window and try again.";
+
 	orderReferenceId: string;
-	amazonPayLoggedIn: boolean = false;
+
+	referenceIdSet: boolean = false;
+	private referenceIdSubject = new Subject<boolean>();
+
+	addressSelected: boolean = false;
 	paymentSelected: boolean = false;
-	readyToConfirm: boolean = false;
+	ratesLoaded: boolean = false;
+	ratesError: boolean = false;
+	rateSelected: boolean = false;
+	showRates: boolean = false;
+	rates: ShippingMethod[];
 
 	amazonPayAddressWidgetLoaded: boolean = false;
 	amazonPayWalletWidgetLoaded: boolean = false;
 	amazonPayLoginButtonLoaded: boolean = false;
 
-	shippingEstimate: ShippingEstimate;
-	order: Order;
+	finalOrder: Order;
 
+	private startPage(): void {
+		this.grabToken();
 
-	logoutAmazonPay(): void {
-		amazon.Login.logout();
-
-		this.amazonPayLoggedIn = false;
-		this.userToken = null;
-		this.userService.setAccessToken(null);
-		
-		document.cookie = "amazon_Login_accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-		
-		this.zone.run(() => {
-			this.router.navigateByUrl('/start');
-		});
+		this.preLoadComplete = true;
+		this.showAmazonPayWidgets();
 	}
 
 	getURLParameter(name, source) {
@@ -59,137 +63,37 @@ export class CheckoutComponent implements OnInit {
 	}
 
 	grabToken(): void {
-
-		this.userToken = null;
 		if (this.popupAmazonPay) {
 			this.messageService.add("Grabbing token from url with ?");
-			this.userToken = this.route.snapshot.queryParamMap.get('access_token');
+			
+			this.userService.setAccessToken(this.route.snapshot.queryParamMap.get('access_token'));
+
+			this.messageService.add(this.userService.getAccessToken());
 		}
 		else {
 			//Fallback to grabbing it via the amazon-provided algorithm
 			this.messageService.add("Grabbing token from url with #");
-			this.userToken = this.getURLParameter("access_token", location.hash);
-			this.messageService.add(this.userToken);
 
-			if (typeof this.userToken === 'string' && this.userToken.match(/^Atza/)) {
-				alert('storing');
-				document.cookie = "amazon_Login_accessToken=" + this.userToken; // + ";secure";
-			}
-		}
+			let accessToken = this.getURLParameter("access_token", location.hash);
+			this.userService.setAccessToken(accessToken);
 
-		if (this.userToken != null) {
-			this.userService.setAccessToken(this.userToken);
-		}
-		else {
-			this.messageService.add("Grabbing token from storage");
-			this.userToken = this.userService.getAccessToken();
-		}
-
-		if (this.userToken != null)
-		{
-			this.amazonPayLoggedIn = true;
-		}
-		else
-		{
-			this.amazonPayLoggedIn = false;
+			this.messageService.add(this.userService.getAccessToken());
 		}
 	}
 
-	showAmazonPayAfterLoad(): void {
-
-		if (this.amazonPayService.getIsLoaded()) {
-			this.messageService.add("Ch.Com: AmPay Already Loaded");
-			this.showAmazonPay();
-		}
-		else {
-			this.messageService.add("Ch.Com: AmPay Unloaded");
-			let tempMsg = this.messageService;
-			this.amazonPayService.waitForLoad().subscribe(
-				(isLoaded) => { 
-					tempMsg.add("Ch.Com: AmPay Subject Done");
-					if(isLoaded) this.showAmazonPay(); 
+	showAmazonPayWidgets(): void {
+		this.amazonPayService.getIsLoaded().subscribe(
+			(isLoaded) => { 
+				this.messageService.add("Ch.Com: AmPay Subject Done");
+				if(isLoaded) {
+					this.showAddressWidget();
+					this.showWalletWidget();
 				}
-			);
-		}
-	}
-
-
-	showAmazonPay(): void {
-		if (!this.amazonPayService.getIsLoaded()) {
-			this.messageService.add("Amazon Pay not loaded. Try again.");
-			return;
-		}
-
-		if (this.amazonPayLoggedIn)
-		{
-			this.showAddressWidget();
-			this.showWalletWidget();
-		}
-		else
-		{
-			this.showAmazonPayButton();
-		}
-	}
-
-
-	showAmazonPayButton(): void {
-		
-		//Don't re-render
-		if (this.amazonPayLoginButtonLoaded)
-			return;
-
-		//Amazon Pay library loaded. Let's create a button and get busy wid it.
-		var authRequest; 
-		OffAmazonPayments.Button("AmazonPayButton", this.amazonPayService.getSellerId(), { 
-			type:  "PwA", 
-			color: "DarkGray", 
-			size:  "medium", 
-
-			authorization: function() {
-				var loginOptions = {
-					scope: "payments:widget",
-					popup: this.popupAmazonPay
-					}; 
-				authRequest = amazon.Login.authorize (loginOptions, "checkout");
-			},
-		    onSignIn: (orderReference) => {
-		      var referenceId = orderReference.getAmazonOrderReferenceId();
-		 
-		      if (!referenceId) {
-		        this.messageService.add('referenceId missing');
-		      }
-		    },
-		    onError: (error) => {
-		    	alert(error);
-		    }
-		});
-
-		this.amazonPayLoginButtonLoaded = true;
-	}
-
-	setAddressSelected(isSelected: boolean): void {
-		
-		this.zone.run(() => {
-
-			//this.messageService.add('Ch.Com: Address Selected');
-
-			//Go to the server with the order reference ID, use that ID to grab the address
-			// from Amazon, then use the address to calculate shipping methods and tax.
-
-			//Clear out existing estimates before getting new ones to prevent out-of-sync errors.
-
-			this.shippingEstimate = null;
-			this.fulfillmentService.getShipping(this.orderReferenceId).subscribe(
-				(estimate) => {this.shippingEstimate = estimate;}
-			);
-
-		});
+			}
+		);
 	}
 
 	showAddressWidget(): void {
-
-		//this.messageService.add("Showing address widget.");
-		
 		//Don't re-render the amazon widgets, because it will spawn a new script reference every time.
 		if (this.amazonPayAddressWidgetLoaded)
 			return;
@@ -198,10 +102,11 @@ export class CheckoutComponent implements OnInit {
 			sellerId: this.amazonPayService.getSellerId(),
 
 			onOrderReferenceCreate: (orderReference) => { 
+				//console.log("Add.Widg.onOrderReferenceCreate: " + orderReference.getAmazonOrderReferenceId());
 			},
 
 			onAddressSelect: (orderReference) => {
-				this.setAddressSelected(true);
+				this.setAddressSelected();
 			},
 
 			design: {
@@ -209,29 +114,14 @@ export class CheckoutComponent implements OnInit {
 			},
 
         	onReady: (orderReference) => {
-        		//We might actually want to hold onto the reference ID in the session storage,
-        		// just in case of a page refresh. But will re-rendering the page give us a new ID?
-
-            	var orderReferenceId = orderReference.getAmazonOrderReferenceId();
-            	this.orderReferenceId = orderReferenceId;
 				this.amazonPayAddressWidgetLoaded = true;
+				this.setOrderReferenceId(orderReference.getAmazonOrderReferenceId());
 			},
 
 			onError: (error) => {
-				// Your error handling code.
-				// During development you can use the following
-				// code to view error messages:
-				// console.log(error.getErrorCode() + ': ' + error.getErrorMessage());
-				// See "Handling Errors" for more information.
+				this.handleAmazonError(error);
 			}
 		}).bind("addressBookWidgetDiv");
-	}
-
-
-	setPaymentSelected(isSelected: boolean): void {
-		this.zone.run(() => {
-			this.paymentSelected = isSelected;
-		});
 	}
 
 	showWalletWidget(): void {
@@ -246,21 +136,15 @@ export class CheckoutComponent implements OnInit {
 			sellerId: this.amazonPayService.getSellerId(),
 
 			onPaymentSelect: (orderReference) => {
-				this.messageService.add('Ch.Com: Payment Selected');
 				this.setPaymentSelected(true);
-				//this.paymentSelected = true;
 			},
 			
 			design: {
 				designMode: 'smartphoneCollapsible'
 			},
-
-			onError: function(error) {
-				// Your error handling code.
-				// During development you can use the following
-				// code to view error messages:
-				// console.log(error.getErrorCode() + ': ' + error.getErrorMessage());
-				// See "Handling Errors" for more information.
+			
+			onError: (error) => {
+				this.handleAmazonError(error);
 			},
 
 			onReady: () => {
@@ -270,38 +154,156 @@ export class CheckoutComponent implements OnInit {
 		}).bind("walletWidgetDiv");
 	}
 
-	selectShippingMethod(method: ShippingMethod): void {
-		this.zone.run(() => {
-			//Apply the selected shipping method to the order
-			this.order.setShippingMethod(method);
-			this.readyToConfirm = true;
-		});
+	triggerOrderReferenceIdSubject(isSet: boolean): void { 
+		this.messageService.add("Reference ID Subject Set.");
+		this.referenceIdSet = isSet;
+		this.referenceIdSubject.next(isSet);
 	}
 
-	confirmOrder(): void {
-		//Actually place the order.
-		//Need to send our order object down to the server with the amazon pay details.
-
-		this.order.orderReferenceId = this.orderReferenceId;
-
-		this.fulfillmentService.saveOrder(this.order).subscribe(
-			(orderSummary) => {
-				this.summaryService.setSummary(orderSummary);
-				this.cartService.clear();
-				this.zone.run(() => {
-					this.router.navigateByUrl('/complete');
-				});
+	getOrderReferenceIdSet(): Observable<boolean> {
+		if (this.referenceIdSet) {
+			return new Observable<boolean>((observer) => {
+				observer.next(true);
+			});
+		}
+		else
+		{
+			return this.referenceIdSubject.asObservable();
+		}
+	}
+	
+	setOrderReferenceId(refId: string): void {
+		this.orderService.setAmazonStuff(refId, this.userService.getAccessToken()).subscribe(
+			(order) => {
+				//Ref ID is set, now other parts of the process can make their mark.
+				this.orderReferenceId = order.orderReferenceId;
+				this.triggerOrderReferenceIdSubject(true);
 			},
 			(error) => {
+				this.criticalError(error);
+			}
+		)
+	}
 
+	setAddressSelected(): void {
+	
+		this.zone.run(() => {
+			this.addressSelected = true;
+			this.ratesLoaded = false;
+			this.rateSelected = false;
+			this.showRates = false;
+			this.ratesError = false;
+		});
+
+		this.getOrderReferenceIdSet().subscribe(
+			(isSet) => {
+				this.zone.run(() => {
+					this.orderService.setShippingAddress().subscribe(
+						(order) => {
+							if (order != null && order.rates != null && order.rates.length > 0) {
+								this.rates = order.rates;
+								this.ratesLoaded = true;
+								this.showRates = true;
+								this.ratesError = false;
+							}
+							else {
+								//No rates returned. What now?
+								this.logError("No rates returned.");
+								this.showRatesError();
+							}
+						},
+						(error) => {
+							//Handle some bullshit.
+							this.logError(error.message);
+							this.showRatesError();
+						}
+					);
+				});
 			}
 		);
 	}
 
-	initializeOrder(): void {
-		//Use the same order that is used by the cart, but reset the checkout-specific fields
-		this.order = this.cartService.getCart();
-		this.order.resetOrder();
+	showRatesError(): void {
+		this.ratesLoaded = false;
+		this.rates = null;
+		this.ratesError = true;
+	}
+
+	setPaymentSelected(isSelected: boolean): void {
+		this.zone.run(() => {
+			//Doesn't need to do anything crazy. Just need to know that everything is selected before we can commit.
+			this.paymentSelected = isSelected;
+		});
+	}
+
+	selectShippingMethod(method: ShippingMethod): void {
+		this.rateSelected = true;
+		this.finalOrder = null;
+		this.showRates = false;
+
+		//Apply the selected shipping method to the order
+		this.orderService.setShippingMethod(method).subscribe(
+			(order) => {
+				this.finalOrder = order;
+			},
+			(error) => {
+				this.criticalError(error);
+			}
+		);
+	}
+	
+	changeShippingMethod(): void {
+		//Let the user see the rates again so they can choose a new one.
+		this.showRates = true;
+	}
+
+	confirmOrder(): void {
+		//Commit order just asks the server to finalize the order and store it in the permanent location.
+		this.orderService.commitOrder().subscribe(
+			(order) => {
+				if (order != null) {
+					//Navigate to the checkout complete route.
+					this.router.navigateByUrl('/complete');
+				}
+				else {
+					this.criticalError("Can't confirm order. Order is null");
+				}
+			},
+			(error) => {
+				//Should probably do something more than just show an error. Maybe give them another try?
+				// Maybe it was just a hiccup.
+				this.criticalError(error.message);
+			}
+		);
+	}
+
+	logoutAmazonPay(): void {
+		this.zone.run(() => {
+			this.userService.logoutAmazonPay();
+		});
+	}
+
+	log(logMessage: string) {
+		this.messageService.add(logMessage, false);
+	}
+
+	logError(logMessage: string) {
+		this.messageService.add(logMessage, true);
+	}
+
+	handleAmazonError(error): void {
+		this.zone.run(() => {
+			this.criticalError(
+				`${error.getErrorCode()} - ${error.getErrorMessage()}`
+				);
+		});
+	}
+
+	criticalError(logMessage: string, displayMessage: string = null): void {
+		this.log(logMessage);
+
+		this.isError = true;
+		this.errorMessage = (displayMessage != null) ? displayMessage : this.defaultCriticalMessage;
 	}
 
 	constructor(
@@ -312,13 +314,20 @@ export class CheckoutComponent implements OnInit {
 		private userService: UserService,
 		private amazonPayService: AmazonPayService,
 		private fulfillmentService: FulfillmentService,
-		private cartService: CartService,
-		private summaryService: SummaryService
+		private orderService: OrderService
 		) { }
 
 	ngOnInit() {
-		this.grabToken();
-		this.showAmazonPayAfterLoad();
-		this.initializeOrder();
+		if (this.userService.getUserAuth() == null)
+		{
+			this.criticalError("Your session has expired. Please close the checkout and try again.");
+		}
+		else {
+			//Get the order. It may need to be loaded from the server. If it doesn't exist, we have a problem.
+			this.orderService.getOrder().subscribe(
+				(order) => { this.startPage(); },
+				(error) => { this.criticalError("Your session has expired. Please close the checkout and try again."); }
+			)
+		}
 	}
 }

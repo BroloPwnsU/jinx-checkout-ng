@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
-import {SummaryService} from '../services/summary.service';
+import {OrderService} from '../services/order.service';
 
-import {OrderSummary} from '../classes/order-summary';
+import {Order} from '../classes/order';
 
 @Component({
   selector: 'app-checkout-complete',
@@ -11,14 +11,23 @@ import {OrderSummary} from '../classes/order-summary';
 })
 export class CheckoutCompleteComponent implements OnInit {
 
-	summary: OrderSummary;	
+	summaryLoaded: boolean = false;
+	summary: Order;	
 
 	loadSummary(): void {
-		this.summary = this.summaryService.getSummary();
-		console.log(this.summary);
+		this.orderService.getOrder().subscribe(
+			(order) => {
+				this.summary = order; 
+				this.summaryLoaded = true;
+			}
+		)
 	}
 
-	constructor(private summaryService: SummaryService) { }
+	closeWindow(): void {
+		//Don't do anything right now.
+	}
+
+	constructor(private orderService: OrderService) { }
 
 	ngOnInit() {
 		this.loadSummary();

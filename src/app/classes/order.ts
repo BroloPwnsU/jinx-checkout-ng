@@ -5,17 +5,23 @@ export class Order {
 	items: OrderItem[] = [];
 
 	orderReferenceId: string;
-
+	accessToken: string;
+	guid: string;
+	
 	subtotal: number = 0;
 	shipping: number = 0;
 	tax: number = 0;
 	discounts: number = 0;
 	total: number = 0;
+	count: number = 0;
 
 	shippingMethod: ShippingMethod;
 
+	rates: ShippingMethod[];
+
 	resetOrder(): void {
 		this.orderReferenceId = null;
+		this.accessToken = null;
 		this.shippingMethod = null;
 		this.shipping = 0;
 		this.tax = 0;
@@ -23,8 +29,8 @@ export class Order {
 		this.calculateTotal();
 	}
 
-	getCount(): number {
-		return this.items.reduce( (tally, item) => {
+	getCount(order: Order): number {
+		return order.items.reduce( (tally, item) => {
 			  return tally + (item.count);
 			}, 0.0); 
 	}
