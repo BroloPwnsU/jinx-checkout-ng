@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone } from '@angular/core';
 
 import { MessageService } from './services/message.service';
 import { AmazonPayService } from './services/amazon-pay.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -9,22 +10,21 @@ import { AmazonPayService } from './services/amazon-pay.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
 	title = 'BETA - J!NX Checkout';
 
 	enableAmazonPay(value) {
-		// this.zone.run(() => {
-		
-		this.messageService.add("Amazon Pay Loaded: " + value);
-		console.log('enableAmazonPay ' + value);
-		
-		this.amazonPayService.setIsLoaded(value);
-
-		// });
+		//Gotta run this in the zone because it's possible that this event is triggering from native JS
+		this.zone.run(() => {
+			this.messageService.add("Amazon Pay Loaded: " + value);
+			this.amazonPayService.setIsLoaded(value);
+		});
 	}
 
-
 	constructor(
-		public zone: NgZone,
+		private router: Router,
+		private route: ActivatedRoute,
+		private zone: NgZone,
 		private messageService: MessageService,
 		private amazonPayService: AmazonPayService
 		)

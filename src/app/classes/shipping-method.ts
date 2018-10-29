@@ -4,5 +4,6 @@ export class ShippingMethod {
 	name: string;
 	deliveryDays: string;
 	dateRange: string;
-	id: number;
+	rateGroupId: number;
+	methodId: number;
 }

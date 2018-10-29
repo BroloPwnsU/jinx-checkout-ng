@@ -35,7 +35,8 @@ export class FulfillmentService {
 					name: "Economy",
 					deliveryDays: "7-10 Days",
 					dateRange: "11/1/2018 - 11/1/2018",
-					id: 101
+					rateGroupId: 101,
+					methodId: 101
 				},
 				{
 					price: 5.13,
@@ -43,7 +44,8 @@ export class FulfillmentService {
 					name: "Standard",
 					deliveryDays: "5-7 Days",
 					dateRange: "11/1/2018 - 11/1/2018",
-					id: 102
+					rateGroupId: 102,
+					methodId: 102
 				},
 				{
 					price: 10.15,
@@ -51,7 +53,8 @@ export class FulfillmentService {
 					name: "Expedited",
 					deliveryDays: "3-4 Days",
 					dateRange: "11/1/2018 - 11/1/2018",
-					id: 103
+					rateGroupId: 103,
+					methodId: 103
 				},
 				{
 					price: 20.47,
@@ -59,7 +62,8 @@ export class FulfillmentService {
 					name: "Overnight",
 					deliveryDays: "1 Day",
 					dateRange: "11/1/2018 - 11/1/2018",
-					id: 104
+					rateGroupId: 104,
+					methodId: 104
 				}
 			];
 

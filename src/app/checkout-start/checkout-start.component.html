@@ -1,11 +1,26 @@
 <p>
-	Checking Out
+	<button (click)="logoutAmazonPay()">Logout from Amazon Pay</button>
 </p>
+<h3>
+	Checkout
+</h3>
+<div *ngIf="isError == false">
+	<app-loading-panel *ngIf="loading" [message]="'Preparing Order...'"></app-loading-panel>
 	<div id="AmazonPayButton"></div>
+</div>
+<div *ngIf="isError">
+	{{errorMessage}}
+</div>
+<hr />
 <p>
-	<button (click)="exitCheckout()">Abort!</button>
+	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
+	<a href="/start?cart=77013:5&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a>
 </p>
 
+<app-error-fake></app-error-fake>
 <p>
-	<a routerLink="/checkout" routerLinkActive="active">Checkout</a>
+	Error Test<br />
+	<button (click)="errorTest(0)">No Error</button><br />
+	<button (click)="errorTest(1)">Unauthorized</button><br />
+	<button (click)="errorTest(2)">Bad Request</button>
 </p>

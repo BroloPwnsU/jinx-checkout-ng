@@ -12,6 +12,10 @@ import { CheckoutComponent } from './checkout/checkout.component';
 import { ErrorPageMissingComponent } from './error-page-missing/error-page-missing.component';
 import { CheckoutCompleteComponent } from './checkout-complete/checkout-complete.component';
 
+import { AuthHttpClient } from './services/auth-http-client.service';
+import { LoadingPanelComponent } from './loading-panel/loading-panel.component';
+import { ErrorFakeComponent } from './error-fake/error-fake.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +23,9 @@ import { CheckoutCompleteComponent } from './checkout-complete/checkout-complete
     CheckoutStartComponent,
     CheckoutComponent,
     ErrorPageMissingComponent,
-    CheckoutCompleteComponent
+    CheckoutCompleteComponent,
+    LoadingPanelComponent,
+    ErrorFakeComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +33,7 @@ import { CheckoutCompleteComponent } from './checkout-complete/checkout-complete
     HttpClientModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [AuthHttpClient],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

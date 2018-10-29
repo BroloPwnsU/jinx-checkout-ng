@@ -19,12 +19,16 @@ export class AmazonPayService  {
 		this.loadingSubject.next(isLoaded);
 	}
 
-	waitForLoad(): Observable<boolean> {
-		return this.loadingSubject.asObservable();
-	}
-
-	getIsLoaded(): boolean {
-		return this.isLoaded;
+	getIsLoaded(): Observable<boolean> {
+		if (this.isLoaded) {
+			return new Observable<boolean>((observer) => {
+				observer.next(true);
+			});
+		}
+		else
+		{
+			return this.loadingSubject.asObservable();
+		}
 	}
 
 	getSellerId(): string {

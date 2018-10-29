@@ -1,9 +1,13 @@
 <br />
 <hr />
 <button (click)="toggleMessages()">Toggle Messages</button>
-<div *ngIf="messageService.messages.length && showMessages">
-  <h3>Messages <button class="clear"
-          (click)="messageService.clear()">clear</button></h3>
+<div *ngIf="messageService.notifications.length && showMessages">
+  <h3>
+    Messages
+    <button class="clear" (click)="messageService.clear()">clear</button>
+  </h3>
   
-  <div *ngFor='let message of messageService.messages'> {{message}} </div>
+  <ul>
+    <li *ngFor='let message of messageService.notifications' [class.error]="message.isError"> {{message.message}} </li>
+  </ul>
 </div>

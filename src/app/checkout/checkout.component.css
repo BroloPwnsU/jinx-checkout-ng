@@ -1,0 +1,7 @@
+.rates-error {
+    border: 1px solid red;
+    color: red;
+    background-color: pink;
+    padding: 10px;
+    font-weight: bold;
+}

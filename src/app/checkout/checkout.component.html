@@ -1,48 +1,67 @@
-
-<div *ngIf="amazonPayLoggedIn">
-	<p>
-	  <button (click)="showAmazonPay();">Show Address Book Widgit</button>
-	</p>
-
-	<p>
-		<button (click)="logoutAmazonPay()">Logout</button>
-	</p>
-
-	<div id="addressBookWidgetDiv"></div>
-	<div id="walletWidgetDiv"></div>
-
-	<div *ngIf="paymentSelected && shippingEstimate != null">
-		<p>Order Ref ID: {{shippingEstimate.orderReferenceId}}</p>
-		<p>Payment Selected</p>
-		<p>Address Selected</p>
-		<p>Shipping Options</p>
-		<ul>
-			<li *ngFor="let method of shippingEstimate.methods">
-				<span>{{method.name}} - {{method.dateRange}}</span>
-				<button (click)="selectShippingMethod(method)">{{method.price | currency}}</button>
-			</li>
-		</ul>
-	</div>
-
-	<div *ngIf="order.shippingMethod != null">
-		<hr />
-		<h3>Confirm Your Order</h3>
-		<p>Shipping: {{order.shippingMethod.price}} ({{order.shippingMethod.name}})</p>
-		<p>Items: {{order.getCount()}} for {{order.subtotal | currency}}
-		<p>Tax: {{order.tax | currency}}</p>
-		<p>Discounts: {{order.discounts | currency}}</p>
-		<p>Total: {{order.total | currency}}</p>
-		<p><button (click)="confirmOrder()">Place Order</button>
-	</div>
-
-</div>
-<div *ngIf="amazonPayLoggedIn == false">
-	<p>
-	  <button (click)="showAmazonPay();">Show Amazon Pay Login Button</button>
-	</p>
-	<div id="AmazonPayButton"></div>
-</div>
-
 <p>
-	<a routerLink="/start" routerLinkActive="active">Start Over</a> 
+	<button (click)="logoutAmazonPay()">Logout from Amazon Pay</button>
+</p>
+<div *ngIf="isError == false">
+
+	<div *ngIf="preLoadComplete == false">
+		<app-loading-panel [message]="'Loading Order Data...'"></app-loading-panel>
+	</div>
+
+	<div *ngIf="preLoadComplete">
+
+		<div id="addressBookWidgetDiv"></div>
+		<div id="walletWidgetDiv"></div>
+
+		<div *ngIf="addressSelected">
+			<p>Order Ref ID: {{orderReferenceId}}</p>
+			<p>Shipping Method</p>
+			<div *ngIf="ratesLoaded == false && ratesError == false">
+				<app-loading-panel [message]="'Loading Shipping Rates...'"></app-loading-panel>
+			</div>
+			<div *ngIf="ratesError" class="rates-error">
+				Sorry, we can't deliver to your address. Please choose a different address.
+			</div>
+			<ul *ngIf="ratesLoaded && showRates">
+				<li *ngFor="let method of rates">
+					<span>{{method.name}} - {{method.dateRange}}</span>
+					<button (click)="selectShippingMethod(method)">{{method.price | currency}}</button>
+				</li>
+			</ul>
+			<div *ngIf="ratesLoaded && rateSelected && !showRates && shippingMethod != null">
+				<span>{{shippingMethod.name}} - {{shippingMethod.dateRange}} - {{shippingMethod.price | currency}}</span>
+				<button (click)="changeShippingMethod()">Change</button>
+			</div>
+		</div>
+
+		<div *ngIf="rateSelected && paymentSelected && addressSelected">
+			<h3>Confirm Your Order</h3>
+			<hr />
+			<app-loading-panel *ngIf="finalOrder == null" [message]="'Calculating Totals...'"></app-loading-panel>
+			<div *ngIf="finalOrder != null">
+				<p>Shipping: {{finalOrder.shippingMethod.price}} ({{finalOrder.shippingMethod.name}})</p>
+				<p>Items: {{finalOrder.count}} for {{finalOrder.subtotal | currency}}
+				<p>Tax: {{finalOrder.tax | currency}}</p>
+				<p>Discounts: {{finalOrder.discounts | currency}}</p>
+				<p>Total: {{finalOrder.total | currency}}</p>
+				<p><button (click)="confirmOrder()">Place Order</button></p>
+			</div>
+		</div> 
+
+	</div>
+</div>
+<div *ngIf="isError">
+	{{errorMessage}}
+</div>
+
+<hr />
+<p>
+	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
+	<a href="/start?cart=77013:5&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a>
+</p>
+<app-error-fake></app-error-fake>
+<p>
+	Error Test<br />
+	<button (click)="errorTest(0)">No Error</button><br />
+	<button (click)="errorTest(1)">Unauthorized</button><br />
+	<button (click)="errorTest(2)">Bad Request</button>
 </p>
