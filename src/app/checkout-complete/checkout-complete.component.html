@@ -1,20 +1,14 @@
-<div *ngIf="summaryLoaded">
-	<p>
-		Checkout Complete!
-	</p>
-	<p>
-		Amazon Pay Order Ref #: {{summary.orderReferenceId}}
-	</p>
-	<p>
-		Total: {{summary.total | currency}}
-	</p>
-	<p>
-		Estimated Ship Date:
-	</p>
-	<p>
-		<a href="https://www.jinx.com/help" target="_blank">Help</a>
-	</p>
-	<p>
-		<button (click)="closeWindow()">Close Checkout</button>
-	</p>
+<h2>
+	Checkout Complete!
+	<button mat-flat-button color="primary" (click)="closeWindow()">Close</button>
+</h2>
+<div *ngIf="listLoaded">
+	<app-order-detail *ngFor="let order of orderList" [order]="order"></app-order-detail>
 </div>
+<app-loading-panel *ngIf="listLoaded == false"></app-loading-panel>
+
+<hr />
+<p>
+	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
+	<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a>
+</p>

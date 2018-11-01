@@ -4,6 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatCardModule} from '@angular/material/card';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatBadgeModule} from '@angular/material/badge';
+import {MatTableModule} from '@angular/material/table';
+import {MatListModule} from '@angular/material/list';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import { AppComponent } from './app.component';
 import { MessagesComponent } from './messages/messages.component';
@@ -15,6 +24,7 @@ import { CheckoutCompleteComponent } from './checkout-complete/checkout-complete
 import { AuthHttpClient } from './services/auth-http-client.service';
 import { LoadingPanelComponent } from './loading-panel/loading-panel.component';
 import { ErrorFakeComponent } from './error-fake/error-fake.component';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
 
 @NgModule({
   declarations: [
@@ -25,13 +35,23 @@ import { ErrorFakeComponent } from './error-fake/error-fake.component';
     ErrorPageMissingComponent,
     CheckoutCompleteComponent,
     LoadingPanelComponent,
-    ErrorFakeComponent
+    ErrorFakeComponent,
+    OrderDetailComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatBadgeModule,
+    MatTableModule,
+    MatListModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   providers: [AuthHttpClient],
   bootstrap: [AppComponent]

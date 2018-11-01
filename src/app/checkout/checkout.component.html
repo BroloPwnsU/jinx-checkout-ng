@@ -1,62 +1,70 @@
 <p>
-	<button (click)="logoutAmazonPay()">Logout from Amazon Pay</button>
+	<button mat-stroked-button (click)="logoutAmazonPay()">Logout from Amazon Pay</button>
 </p>
-<div *ngIf="isError == false">
+<div *ngIf="showCriticalError == false">
+
+	<div id="addressBookWidgetDiv"></div>
+	<div id="walletWidgetDiv"></div>
+	<div *ngIf="showCheckoutError" class="checkout-error">
+		<span>{{checkoutErrorMessage}}</span>
+	</div>
+
+	<div *ngIf="addressSelected">
+
+		<div *ngIf="ratesLoaded == false && ratesError == false">
+			<app-loading-panel [message]="'Loading Shipping Rates...'"></app-loading-panel>
+		</div>
+
+		<div *ngIf="ratesLoaded && showRates">
+			<h3>Choose Shipping Method</h3>
+			<div *ngFor="let method of rates">
+				<h4>
+					<button mat-flat-button color="primary" (click)="selectShippingMethod(method)" class="shipping-button" >
+						{{method.name}}
+					</button>
+					<span class="shipping-price">{{method.price | currency}}</span>
+				</h4>
+			</div>
+		</div>
+		
+		<div *ngIf="ratesLoaded && rateSelected && showRates == false && finalOrder != null">
+			<h3>Selected Shipping Method</h3>
+			<span>{{finalOrder.shippingMethod.name}} - {{finalOrder.shippingMethod.price | currency}}</span>
+			<button mat-button color="primary" (click)="changeShippingMethod()" class="change-shipping">Change</button>
+		</div>
+	</div>
+
+	<div *ngIf="rateSelected && paymentSelected && addressSelected">
+		<hr />
+		<app-loading-panel *ngIf="finalOrder == null" [message]="'Calculating Totals...'"></app-loading-panel>
+		<div *ngIf="finalOrder != null">
+			<h3>Confirm Your Order</h3>
+			<p>Shipping: {{finalOrder.shippingMethod.price | currency}} ({{finalOrder.shippingMethod.name}})</p>
+			<p>Items: {{finalOrder.count}} for {{finalOrder.subtotal | currency}}
+			<p>Tax: {{finalOrder.tax | currency}}</p>
+			<p>Discounts: {{finalOrder.discounts | currency}}</p>
+			<p>Total: {{finalOrder.total | currency}}</p>
+			<div class="place-order" *ngIf="placingOrder == false">
+				<button mat-flat-button color="primary" (click)="confirmOrder()">Place Order</button>
+			</div>
+			<app-loading-panel *ngIf="placingOrder" [message]="'Confirming Payment...'"></app-loading-panel>
+		</div>
+		<div>Order Ref ID: {{orderReferenceId}}</div>
+	</div> 
 
 	<div *ngIf="preLoadComplete == false">
 		<app-loading-panel [message]="'Loading Order Data...'"></app-loading-panel>
 	</div>
-
-	<div *ngIf="preLoadComplete">
-
-		<div id="addressBookWidgetDiv"></div>
-		<div id="walletWidgetDiv"></div>
-
-		<div *ngIf="addressSelected">
-			<p>Order Ref ID: {{orderReferenceId}}</p>
-			<p>Shipping Method</p>
-			<div *ngIf="ratesLoaded == false && ratesError == false">
-				<app-loading-panel [message]="'Loading Shipping Rates...'"></app-loading-panel>
-			</div>
-			<div *ngIf="ratesError" class="rates-error">
-				Sorry, we can't deliver to your address. Please choose a different address.
-			</div>
-			<ul *ngIf="ratesLoaded && showRates">
-				<li *ngFor="let method of rates">
-					<span>{{method.name}} - {{method.dateRange}}</span>
-					<button (click)="selectShippingMethod(method)">{{method.price | currency}}</button>
-				</li>
-			</ul>
-			<div *ngIf="ratesLoaded && rateSelected && !showRates && shippingMethod != null">
-				<span>{{shippingMethod.name}} - {{shippingMethod.dateRange}} - {{shippingMethod.price | currency}}</span>
-				<button (click)="changeShippingMethod()">Change</button>
-			</div>
-		</div>
-
-		<div *ngIf="rateSelected && paymentSelected && addressSelected">
-			<h3>Confirm Your Order</h3>
-			<hr />
-			<app-loading-panel *ngIf="finalOrder == null" [message]="'Calculating Totals...'"></app-loading-panel>
-			<div *ngIf="finalOrder != null">
-				<p>Shipping: {{finalOrder.shippingMethod.price}} ({{finalOrder.shippingMethod.name}})</p>
-				<p>Items: {{finalOrder.count}} for {{finalOrder.subtotal | currency}}
-				<p>Tax: {{finalOrder.tax | currency}}</p>
-				<p>Discounts: {{finalOrder.discounts | currency}}</p>
-				<p>Total: {{finalOrder.total | currency}}</p>
-				<p><button (click)="confirmOrder()">Place Order</button></p>
-			</div>
-		</div> 
-
-	</div>
+	
 </div>
-<div *ngIf="isError">
-	{{errorMessage}}
+<div *ngIf="showCriticalError" class="checkout-error">
+	{{criticalErrorMessage}}
 </div>
 
 <hr />
 <p>
 	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
-	<a href="/start?cart=77013:5&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a>
+	<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a> <br />
 </p>
 <app-error-fake></app-error-fake>
 <p>

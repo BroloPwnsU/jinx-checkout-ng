@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 import {MessageService} from './message.service';
 import {TwitchAuth} from '../classes/twitch-auth';
@@ -11,17 +11,6 @@ declare var amazon: any;
   providedIn: 'root'
 })
 export class UserService  {
-
-	constructor(
-		private messageService: MessageService,
-		private router: Router
-		) {		
-	}
-
-	ngOnInit(): void {
-		this.accessToken = this.loadSomething(this.accessTokenStorageKey);
-		this.userAuth = this.loadTwitchAuth(this.userAuthStorageKey);
-	}
 
 	userAuth: TwitchAuth = null;
 	userAuthStorageKey: string = "app-user-auth";
@@ -112,5 +101,18 @@ export class UserService  {
 		let optionalAmp: string = (prependAmp) ? '&' : '';
 
 		return `${optionalAmp}token=${this.userAuth.token}&userid=${this.userAuth.userId}&channelid=${this.userAuth.channelId}`;
+	}
+
+	
+
+	constructor(
+		private messageService: MessageService,
+		private router: Router
+		) {		
+	}
+
+	ngOnInit(): void {
+		this.accessToken = this.loadSomething(this.accessTokenStorageKey);
+		this.userAuth = this.loadTwitchAuth(this.userAuthStorageKey);
 	}
 }
