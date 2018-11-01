@@ -3,13 +3,13 @@ import {Router, ActivatedRoute, Params} from '@angular/router';
 import {Observable, Subject} from 'rxjs';
 
 import {MessageService} from '../services/message.service';
-import {FulfillmentService} from '../services/fulfillment.service';
 import {UserService} from '../services/user.service'; 
 import {AmazonPayService} from '../services/amazon-pay.service';
 import {OrderService} from '../services/order.service';
 
 import {ShippingMethod} from '../classes/shipping-method';
 import {Order} from '../classes/order';
+import {OrderErrorState} from '../classes/order-error-state';
 
 
 declare var OffAmazonPayments: any;
@@ -27,9 +27,18 @@ export class CheckoutComponent implements OnInit {
 	preLoadComplete: boolean = false;
 	
 	//Error stuff
-	isError: boolean = false;
-	errorMessage: string = "";
-	defaultCriticalMessage: string = "Checkout has suffered a critical error. Please close the Checkout window and try again.";
+	showCheckoutError: boolean = false;
+	checkoutErrorMessage: string = "";
+	tryAgainMessage: string = "The server encountered a temporary problem. Please try again.";
+
+	showCriticalError: boolean = false;
+	criticalErrorMessage: string = "";
+	closeCheckoutMessage: string = "Checkout has suffered a critical error. Please close the Checkout window and start over.";
+
+	paymentMissingMessage: string = "Please provide a valid payment method.";
+	paymentInvalidMessage: string = "We can not accept your payment method. Please provide a valid payment method and try again.";
+	addressMissingMessage: string = "Please provide a valid shipping address.";
+	addressInvalidMessage: string = "We can not ship to your address. Please provide a different address and try again.";
 
 	orderReferenceId: string;
 
@@ -43,6 +52,7 @@ export class CheckoutComponent implements OnInit {
 	rateSelected: boolean = false;
 	showRates: boolean = false;
 	rates: ShippingMethod[];
+	placingOrder: boolean = false;
 
 	amazonPayAddressWidgetLoaded: boolean = false;
 	amazonPayWalletWidgetLoaded: boolean = false;
@@ -53,7 +63,6 @@ export class CheckoutComponent implements OnInit {
 	private startPage(): void {
 		this.grabToken();
 
-		this.preLoadComplete = true;
 		this.showAmazonPayWidgets();
 	}
 
@@ -134,7 +143,7 @@ export class CheckoutComponent implements OnInit {
 
 		new OffAmazonPayments.Widgets.Wallet({
 			sellerId: this.amazonPayService.getSellerId(),
-
+			amazonOrderReferenceId: this.orderReferenceId,
 			onPaymentSelect: (orderReference) => {
 				this.setPaymentSelected(true);
 			},
@@ -145,10 +154,6 @@ export class CheckoutComponent implements OnInit {
 			
 			onError: (error) => {
 				this.handleAmazonError(error);
-			},
-
-			onReady: () => {
-				this.amazonPayWalletWidgetLoaded = true;
 			}
 
 		}).bind("walletWidgetDiv");
@@ -173,6 +178,8 @@ export class CheckoutComponent implements OnInit {
 	}
 	
 	setOrderReferenceId(refId: string): void {
+		this.zone.run(() => { this.preLoadComplete = true });
+		this.messageService.add(refId);
 		this.orderService.setAmazonStuff(refId, this.userService.getAccessToken()).subscribe(
 			(order) => {
 				//Ref ID is set, now other parts of the process can make their mark.
@@ -198,6 +205,10 @@ export class CheckoutComponent implements OnInit {
 		this.getOrderReferenceIdSet().subscribe(
 			(isSet) => {
 				this.zone.run(() => {
+
+					//Don't want to show the wallet until the address is chosen.
+					this.showWalletWidget();
+
 					this.orderService.setShippingAddress().subscribe(
 						(order) => {
 							if (order != null && order.rates != null && order.rates.length > 0) {
@@ -207,15 +218,12 @@ export class CheckoutComponent implements OnInit {
 								this.ratesError = false;
 							}
 							else {
-								//No rates returned. What now?
-								this.logError("No rates returned.");
-								this.showRatesError();
+								this.showRatesError("No rates returned.");
 							}
 						},
 						(error) => {
 							//Handle some bullshit.
-							this.logError(error.message);
-							this.showRatesError();
+							this.showRatesError(error.message);
 						}
 					);
 				});
@@ -223,10 +231,12 @@ export class CheckoutComponent implements OnInit {
 		);
 	}
 
-	showRatesError(): void {
+	showRatesError(logMessage: string): void {
+		alert('rates error');
 		this.ratesLoaded = false;
 		this.rates = null;
 		this.ratesError = true;
+		this.checkoutError(logMessage, this.addressInvalidMessage);
 	}
 
 	setPaymentSelected(isSelected: boolean): void {
@@ -258,15 +268,45 @@ export class CheckoutComponent implements OnInit {
 	}
 
 	confirmOrder(): void {
+		this.placingOrder = true;
+
 		//Commit order just asks the server to finalize the order and store it in the permanent location.
 		this.orderService.commitOrder().subscribe(
 			(order) => {
-				if (order != null) {
-					//Navigate to the checkout complete route.
+				if (order == null || !order.isError) {
+					this.router.navigateByUrl('/complete');
+					return;
+				}
+				
+				this.placingOrder = false;
+
+				if (order.errorState == null) {
+					//Generic error.
+					this.checkoutError("Unspecified error - Null error state: " + order.logMessage);
+				}
+
+				//Check order object for errors.
+				//It should really 
+				if (order.errorState.orderComplete) {
 					this.router.navigateByUrl('/complete');
 				}
-				else {
-					this.criticalError("Can't confirm order. Order is null");
+				else if (order.errorState.permanentError) {
+					this.criticalError(order.logMessage);
+				}
+				else if (order.errorState.needsPayment) {
+					this.checkoutError(order.logMessage, this.paymentMissingMessage);
+				}
+				else if (order.errorState.badPayment) {
+					this.checkoutError(order.logMessage, this.paymentInvalidMessage);
+				}
+				else if (order.errorState.needsAddress) {
+					this.checkoutError(order.logMessage, this.addressMissingMessage);
+				}
+				else if (order.errorState.badAddress) {
+					this.checkoutError(order.logMessage, this.addressInvalidMessage);
+				}
+				else if (order.errorState.temporaryError) {
+					this.checkoutError(order.logMessage);
 				}
 			},
 			(error) => {
@@ -299,11 +339,43 @@ export class CheckoutComponent implements OnInit {
 		});
 	}
 
+	handleConstraints(constraintList: number[]) : void {
+		//Looks at the list of amazon-provided order constraints to direct the customer on how to fix the problem.
+		if (constraintList == null || constraintList.length == 0) {
+			this.checkoutError("Constraint list is empty.");
+		}
+		
+        // PaymentMethodNotAllowed = 3,
+        // PaymentPlanNotSet = 4,
+        // ShippingAddressNotSet = 5
+		if (constraintList.indexOf(3) > -1 || constraintList.indexOf(4) > -1) {
+			//Need to choose another payment method.
+			this.checkoutError("Constraint 5 - Shipping Address", "We can not accept your selected payment method. Please choose a different payment method and try again.");
+			this.paymentSelected = false;
+		}
+		else if (constraintList.indexOf(5) > -1) {
+			//Need to choose a shipping address.
+			this.checkoutError("Constraint 5 - Shipping Address", "We can not ship to your address. Please choose a different shipping address and try again.");
+			this.addressSelected = false;
+		}
+		else {
+			//The other messages shouldn't get here, but whatever.
+			this.checkoutError("Unexpected constraint: " + constraintList[0]);
+		}
+	}
+
 	criticalError(logMessage: string, displayMessage: string = null): void {
 		this.log(logMessage);
 
-		this.isError = true;
-		this.errorMessage = (displayMessage != null) ? displayMessage : this.defaultCriticalMessage;
+		this.showCriticalError = true;
+		this.criticalErrorMessage = (displayMessage != null) ? displayMessage : this.closeCheckoutMessage;
+	}
+
+	checkoutError(logMessage: string, displayMessage: string = null): void {
+		this.log(logMessage);
+
+		this.showCheckoutError = true;
+		this.checkoutErrorMessage = (displayMessage != null) ? displayMessage : this.tryAgainMessage;
 	}
 
 	constructor(
@@ -313,7 +385,6 @@ export class CheckoutComponent implements OnInit {
 		private messageService: MessageService,
 		private userService: UserService,
 		private amazonPayService: AmazonPayService,
-		private fulfillmentService: FulfillmentService,
 		private orderService: OrderService
 		) { }
 
@@ -325,7 +396,16 @@ export class CheckoutComponent implements OnInit {
 		else {
 			//Get the order. It may need to be loaded from the server. If it doesn't exist, we have a problem.
 			this.orderService.getOrder().subscribe(
-				(order) => { this.startPage(); },
+				(order) => {
+					
+					if (order == null || order.statusCode == 1) {
+						this.orderService.clear();
+						this.router.navigateByUrl('/complete');
+						return;
+					}
+
+					this.startPage();
+				},
 				(error) => { this.criticalError("Your session has expired. Please close the checkout and try again."); }
 			)
 		}

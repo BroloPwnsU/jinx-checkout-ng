@@ -1,0 +1,33 @@
+<div class="order-detail">
+  <h3>
+		Amazon Pay Order Ref #: {{order.orderReferenceId}} - {{order.confirmDateObj | date:'medium'}}
+		<button mat-button color="primary" (click)="toggleShow()">Show</button>
+	</h3>
+	
+	<mat-list *ngIf="showOrder">
+			<h3>
+				Total: {{order.total | currency}}
+			</h3>
+			<mat-list-item>Items: {{order.subtotal | currency}}</mat-list-item>
+			<mat-list-item>Shipping: {{order.shipping | currency}}</mat-list-item>
+			<mat-list-item>Tax: {{order.tax | currency}}</mat-list-item>
+	</mat-list>
+
+	<div  *ngIf="showOrder">
+			<h4>
+				Items
+			</h4>
+			<mat-list>
+				<mat-list-item *ngFor="let item of order.items">			
+					<h4 mat-line>{{item.productName}}</h4>
+					<p mat-line>
+						<span class="item-count">{{item.count}}</span>
+						<span class="item-color">{{item.colorName}}</span> - <span class="item-size">{{item.sizeName}}</span>
+					</p>
+				</mat-list-item>
+			</mat-list>
+			<p>
+				<a href="https://www.jinx.com/help" target="_blank">Help</a>
+			</p>
+	</div>
+</div>

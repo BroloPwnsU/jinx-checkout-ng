@@ -8,8 +8,6 @@ import {UserService} from './user.service';
 import {AuthHttpClient} from './auth-http-client.service';
 
 import {Order} from '../classes/order';
-import {OrderItem} from '../classes/order-item';
-import {TwitchAuth} from '../classes/twitch-auth';
 import { ShippingMethod } from '../classes/shipping-method';
 
 @Injectable({
@@ -79,17 +77,26 @@ export class OrderService implements OnInit {
         return this.sendRequest(theUrl, 'loadOrder');
     }
 
+    public clear(): void {
+        this.order = null;
+    }
+
     private sendRequest(theUrl: string, actionName: string): Observable<Order> {
-        if (this.errorFake == 0) {
-            return this.authHttp.get<Order>(theUrl).pipe(
-                tap(order => { this.order = <Order>order; })
-                , catchError(this.handleError(actionName, null))
-            );
+        if (this.errorFake == 2) {
+            return new Observable<Order> ((observer) => {
+                observer.error("This is messed up.");
+            });
         }
         else if (this.errorFake == 1) {
             return new Observable<Order> ((observer) => {
                 observer.next(null);
             });
+        }
+        else {
+            return this.authHttp.get<Order>(theUrl).pipe(
+                tap(order => { this.order = <Order>order; })
+                , catchError(this.handleError(actionName, null))
+            );
         }
     }
 

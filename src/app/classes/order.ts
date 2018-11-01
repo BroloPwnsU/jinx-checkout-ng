@@ -1,7 +1,18 @@
 import {OrderItem} from './order-item';
+import {OrderErrorState} from './order-error-state';
 import {ShippingMethod} from './shipping-method';
 
 export class Order {
+	
+	isError: boolean = false;
+
+	statusCode: number = 0;
+	errorState: OrderErrorState = new OrderErrorState();
+	logMessage: string = null;
+	
+	confirmDate: string = null;
+	confirmDateObj: Date = null;
+
 	items: OrderItem[] = [];
 
 	orderReferenceId: string;

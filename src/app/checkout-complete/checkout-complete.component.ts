@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import {OrderService} from '../services/order.service';
+import { HistoryService } from '../services/history.service';
 
 import {Order} from '../classes/order';
 
@@ -11,14 +11,14 @@ import {Order} from '../classes/order';
 })
 export class CheckoutCompleteComponent implements OnInit {
 
-	summaryLoaded: boolean = false;
-	summary: Order;	
+	listLoaded: boolean = false;
+	orderList: Order[] = null;
 
-	loadSummary(): void {
-		this.orderService.getOrder().subscribe(
+	loadHistory(): void {
+		this.historyService.getAll().subscribe(
 			(order) => {
-				this.summary = order; 
-				this.summaryLoaded = true;
+				this.orderList = order; 
+				this.listLoaded = true;
 			}
 		)
 	}
@@ -27,10 +27,10 @@ export class CheckoutCompleteComponent implements OnInit {
 		//Don't do anything right now.
 	}
 
-	constructor(private orderService: OrderService) { }
+	constructor(private historyService: HistoryService) { }
 
 	ngOnInit() {
-		this.loadSummary();
+		this.loadHistory();
 	}
 
 }
