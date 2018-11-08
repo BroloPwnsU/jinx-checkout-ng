@@ -55,11 +55,14 @@ export class UserService  {
 	}
 		
 	logoutAmazonPay(): void {
+
+		localStorage.clear();
+
 		amazon.Login.logout();
 		document.cookie = "amazon_Login_accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
 		this.setAccessToken(null);		
-		this.router.navigateByUrl('/start');
+		this.router.navigateByUrl('/terminator');
 	}
 
 	setAccessToken(accessToken: string): void { 

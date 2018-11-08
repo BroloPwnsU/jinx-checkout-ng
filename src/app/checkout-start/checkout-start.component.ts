@@ -30,13 +30,13 @@ export class CheckoutStartComponent implements OnInit {
 				var authRequest; 
 				OffAmazonPayments.Button("AmazonPayButton", this.amazonPayService.getSellerId(), { 
 					type:  "PwA", 
-					color: "DarkGray", 
+					color: "Gold", 
 					size:  "medium", 
 		
 					authorization: function() { 
 						var loginOptions = {
 							scope: "profile payments:widget payments:shipping_address", //"payments:widget", 
-							popup: false
+							popup: true //this.popupAmazonPay
 						}; 
 						authRequest = amazon.Login.authorize (loginOptions, "checkout");
 					},
@@ -56,11 +56,18 @@ export class CheckoutStartComponent implements OnInit {
 		//Pass those params on to the data layer to auth the user, validate the items, and create an order object.
 		let urlUserAuth: TwitchAuth = this.buildUserAuthFromUrl();
 		let cartString: string = this.route.snapshot.queryParamMap.get('cart');
-		if (urlUserAuth == null || cartString == null) {
+		
+		this.messageService.debug("UserAuth Url: " + urlUserAuth);
+		this.messageService.debug("CartString Url: " + cartString);
+
+		if (urlUserAuth == null || urlUserAuth.isEmpty() || cartString == null) {
+			this.messageService.debug("Loading existing order from memory, using existing auth info.");
 			//The url is incomplete. Is there something stored for this user on the server?
 			this.orderService.getOrder().subscribe(
 				(order) => {
 					if (order != null) {
+						this.messageService.debug("Order found in memory. Showing APAY.");
+						this.isError = false;
 						this.showAmazonPayButton();
 						this.loading = false;
 					}
@@ -83,6 +90,7 @@ export class CheckoutStartComponent implements OnInit {
 					if (validOrder != null) {
 						//Order is valid. Let's do it. Go to amazon pay now.
 						this.loading = false;
+						this.isError = false;
 						this.showAmazonPayButton();
 					}
 					else {
