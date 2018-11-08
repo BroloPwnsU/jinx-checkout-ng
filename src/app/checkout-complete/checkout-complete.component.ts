@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { HistoryService } from '../services/history.service';
 
 import {Order} from '../classes/order';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-checkout-complete',
@@ -23,11 +24,18 @@ export class CheckoutCompleteComponent implements OnInit {
 		)
 	}
 
+	logoutAmazonPay(): void {
+		this.userService.logoutAmazonPay();
+	}
+
 	closeWindow(): void {
 		//Don't do anything right now.
 	}
 
-	constructor(private historyService: HistoryService) { }
+	constructor(
+		private historyService: HistoryService
+		, private userService: UserService
+		) { }
 
 	ngOnInit() {
 		this.loadHistory();

@@ -14,19 +14,22 @@ export class AmazonPayService  {
 	private loadingSubject = new Subject<boolean>();
 
 	setIsLoaded(isLoaded: boolean): void { 
-		this.messageService.add("Is loading.");
+		this.messageService.debug("APAY script just finished loading. Triggering observable.");
 		this.isLoaded = isLoaded;
 		this.loadingSubject.next(isLoaded);
 	}
 
 	getIsLoaded(): Observable<boolean> {
+		this.messageService.debug("APAY getIsLoaded().");
 		if (this.isLoaded) {
+			this.messageService.debug("APAY is already loaded.");
 			return new Observable<boolean>((observer) => {
 				observer.next(true);
 			});
 		}
 		else
 		{
+			this.messageService.debug("APAY is not loaded yet. Waiting for observable to trigger.");
 			return this.loadingSubject.asObservable();
 		}
 	}

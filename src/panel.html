@@ -5,13 +5,23 @@
 	<script type='text/javascript'>
 	    window.onAmazonLoginReady = function() {
 	    	amazon.Login.setClientId('amzn1.application-oa2-client.f0894cb4347b4eeb950b4b96f3e746e7');
-        amazon.Login.setUseCookie(true);
+			amazon.Login.setUseCookie(true);
 	    };
 	    window.onAmazonPaymentsReady = function() {
-	    	  if (window.angularComponentRef != null)
-	        {
-	        	window.angularComponentRef.enableAmazonPay(true);
-	        }
+			
+			console.log("APAY window.onAmazonPaymentsReady()");
+
+			if (window.amazonTunnel != null)
+			{			
+				window.amazonTunnel.enableAmazonPay(true);
+			}
+			else
+			{
+				//If the twitch tunnel hasn't been opened yet by our app, drill it from this side
+				window.amazonTunnel = {
+					amazonPayPreloaded: true
+				}
+			}
 	    };
 	</script>
 	

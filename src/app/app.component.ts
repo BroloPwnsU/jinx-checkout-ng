@@ -29,12 +29,20 @@ export class AppComponent implements OnInit {
 		private amazonPayService: AmazonPayService
 		)
 	{
-	    (<any>window).angularComponentRef = {
+
+		if ((<any>window).amazonTunnel != null 
+			&& (<any>window).amazonTunnel.amazonPayPreloaded != null)
+		{
+			this.messageService.debug("APAY loaded before Angular.");
+			this.enableAmazonPay((<any>window).twitchTunnel.amazonPayPreloaded);
+		}
+
+		this.messageService.debug("Drilling APAY tunnel.");
+	    (<any>window).amazonTunnel = {
 	      zone: this.zone, 
 	      enableAmazonPay: (value) => this.enableAmazonPay(value), 
 	      component: this
 	    };
-	    this.messageService.add('reference added');
 	}
 
 	ngOnInit(): void {

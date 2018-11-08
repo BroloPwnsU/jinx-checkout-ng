@@ -22,7 +22,7 @@ declare var amazon: any;
 })
 export class CheckoutComponent implements OnInit {
 
-	popupAmazonPay: boolean = false;
+	popupAmazonPay: boolean = true;
 
 	preLoadComplete: boolean = false;
 	

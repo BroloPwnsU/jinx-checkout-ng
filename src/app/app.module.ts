@@ -25,6 +25,7 @@ import { AuthHttpClient } from './services/auth-http-client.service';
 import { LoadingPanelComponent } from './loading-panel/loading-panel.component';
 import { ErrorFakeComponent } from './error-fake/error-fake.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
+import { TerminatorComponent } from './terminator/terminator.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { OrderDetailComponent } from './order-detail/order-detail.component';
     CheckoutCompleteComponent,
     LoadingPanelComponent,
     ErrorFakeComponent,
-    OrderDetailComponent
+    OrderDetailComponent,
+    TerminatorComponent
   ],
   imports: [
     BrowserModule,

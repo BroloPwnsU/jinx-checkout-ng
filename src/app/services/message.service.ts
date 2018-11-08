@@ -6,7 +6,16 @@ import {Notification} from '../classes/notification';
     providedIn: 'root'
 })
 export class MessageService {
+    
+    debugMode: boolean = true;
+
     notifications: Notification[] = [];
+
+    debug(message: string, isError: boolean = false): void {
+        if (this.debugMode) {
+            this.add(message, isError);
+        }
+    }
 
     add(message: string, isError: boolean = false): void {
         let notification: Notification = new Notification(message, isError);

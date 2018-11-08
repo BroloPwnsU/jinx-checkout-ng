@@ -4,12 +4,14 @@ import { CheckoutStartComponent } from './checkout-start/checkout-start.componen
 import { CheckoutComponent } from './checkout/checkout.component';
 import { CheckoutCompleteComponent } from './checkout-complete/checkout-complete.component';
 import { ErrorPageMissingComponent } from './error-page-missing/error-page-missing.component';
+import { TerminatorComponent } from './terminator/terminator.component';
 
 
 const routes: Routes = [
 	{ path: 'start', component: CheckoutStartComponent },
 	{ path: 'checkout', component: CheckoutComponent },
 	{ path: 'complete', component: CheckoutCompleteComponent },
+	{ path: 'terminator', component: TerminatorComponent },
 	{ path: '', redirectTo: 'start', pathMatch: 'full' },
 	{ path: '**', component: ErrorPageMissingComponent }
 ];
