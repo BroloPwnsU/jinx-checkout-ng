@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
 			&& (<any>window).amazonTunnel.amazonPayPreloaded != null)
 		{
 			this.messageService.debug("APAY loaded before Angular.");
-			this.enableAmazonPay((<any>window).twitchTunnel.amazonPayPreloaded);
+			this.enableAmazonPay((<any>window).amazonTunnel.amazonPayPreloaded);
 		}
 
 		this.messageService.debug("Drilling APAY tunnel.");
