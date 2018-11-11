@@ -2,7 +2,8 @@ export class ShippingMethod {
 	tax: number;
 	price: number;
 	name: string;
-	deliveryDays: string;
+	minDeliveryDays: string;
+	maxDeliveryDays: string;
 	dateRange: string;
 	rateGroupId: number;
 	methodId: number;

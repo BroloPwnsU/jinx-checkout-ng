@@ -1,27 +1,62 @@
-<p>
-	<button mat-stroked-button (click)="logoutAmazonPay()">Logout from Amazon Pay <mat-icon>no_encryption</mat-icon></button>
-</p>
-<h3>
-	Checkout
-</h3>
+<app-checkout-header></app-checkout-header>
 <div *ngIf="isError == false">
-	<app-loading-panel *ngIf="loading" [message]="'Preparing Order...'"></app-loading-panel>
-	<div id="AmazonPayButton"></div>
+		
+	<div *ngIf="loading">
+		<h3>
+			Preparing Order
+		</h3>
+		<app-loading-panel *ngIf="loading" [showMessage]="false"></app-loading-panel>
+	</div>
+
+	<div *ngIf="loading == false && order != null" class="begin-checkout">
+		<div>
+			Start the checkout by clicking on the Amazon Pay button.
+		</div>
+		<div class="begin-order-subtotal">
+			Subtotal: {{order.subtotal | currency}}
+		</div>
+	</div>
+
+	<div id="AmazonPayButton" class="login-button"></div>
+	
+	<div *ngIf="loading == false && order != null">
+		<div class="cheeky-panel">
+			<h3>
+				<mat-icon>face</mat-icon>
+				<mat-icon>help_outline</mat-icon>
+				<mat-icon>accessibility_new</mat-icon>
+			</h3>
+			<p>
+				Don't have an Amazon account? Don't worry, creating an account is quick and easy!
+				Besides, everybody has an Amazon account. You don't want to be the only one who doesn't have an account, do you?!
+			</p>
+			<p>
+				Embrace your overlords and click on the Amazon Pay button to start your account today!
+			</p>
+		</div>
+		<h3>Your Order Items</h3>
+		<app-order-item-list></app-order-item-list>
+	</div>
 </div>
 <div *ngIf="isError">
 	{{errorMessage}}
 </div>
-<hr />
-<p>
-	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
-	<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a> <br />
-	<a routerLink="/complete" routerLinkActive="active">History</a>
-</p>
 
-<app-error-fake></app-error-fake>
-<p>
-	Error Test<br />
-	<button (click)="errorTest(0)">No Error</button><br />
-	<button (click)="errorTest(1)">Unauthorized</button><br />
-	<button (click)="errorTest(2)">Bad Request</button>
-</p>
+<button mat-button (click)="toggleTesting()" >.</button>
+<div *ngIf="showTesting" class="testing-panel">
+	<div class="reference-panel">
+		Amazon Pay Order Reference ID<br />
+		<span>{{orderReferenceId}}</span>
+	</div>
+	<p>
+		<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
+		<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a> <br />
+	</p>
+	<app-error-fake></app-error-fake>
+	<p>
+		Error Test<br />
+		<button (click)="errorTest(0)">No Error</button><br />
+		<button (click)="errorTest(1)">Unauthorized</button><br />
+		<button (click)="errorTest(2)">Bad Request</button>
+	</p>
+</div>

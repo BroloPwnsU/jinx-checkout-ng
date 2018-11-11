@@ -8,6 +8,8 @@ import { Component, OnInit, Input } from '@angular/core';
 export class LoadingPanelComponent implements OnInit {
 
   @Input() message: string = "Loading...";
+  @Input() staySquare: boolean = false;
+  @Input() showMessage: boolean = true;
   
   constructor() { }
 

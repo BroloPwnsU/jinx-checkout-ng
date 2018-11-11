@@ -1,0 +1,11 @@
+
+<app-loading-panel *ngIf="imageFailed == false && imageLoaded == false" showMessage="false" staySquare="true"></app-loading-panel>
+<img class="product-image" mat-card-image *ngIf="imageLoaded" src="{{imageSource}}" alt="Photo of another fantastic product" />
+<div *ngIf="imageFailed" class="stay-square">
+  <div class="stretchy-wrapper">
+    <div>
+        <mat-icon color="warn">error</mat-icon>
+        <p>Image failed to load.</p>
+    </div>
+  </div>
+</div>
