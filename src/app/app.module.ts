@@ -26,6 +26,9 @@ import { LoadingPanelComponent } from './loading-panel/loading-panel.component';
 import { ErrorFakeComponent } from './error-fake/error-fake.component';
 import { OrderDetailComponent } from './order-detail/order-detail.component';
 import { TerminatorComponent } from './terminator/terminator.component';
+import { CheckoutHeaderComponent } from './checkout-header/checkout-header.component';
+import { OrderItemListComponent } from './order-item-list/order-item-list.component';
+import { ProductImageComponent } from './product-image/product-image.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +41,10 @@ import { TerminatorComponent } from './terminator/terminator.component';
     LoadingPanelComponent,
     ErrorFakeComponent,
     OrderDetailComponent,
-    TerminatorComponent
+    TerminatorComponent,
+    CheckoutHeaderComponent,
+    OrderItemListComponent,
+    ProductImageComponent
   ],
   imports: [
     BrowserModule,

@@ -1,33 +1,41 @@
 <div class="order-detail">
-  <h3>
-		Amazon Pay Order Ref #: {{order.orderReferenceId}} - {{order.confirmDateObj | date:'medium'}}
-		<button mat-button color="primary" (click)="toggleShow()">Show</button>
+	<h3>
+		Order Reference #:<br />
+		{{order.orderReferenceId}}
 	</h3>
+	<p>
+		{{order.confirmDateObj | date:'medium'}}
+	</p>
+	<p>
+		<button mat-button color="primary" (click)="toggleShow()">Show Details</button>
+	</p>
 	
-	<mat-list *ngIf="showOrder">
-			<h3>
-				Total: {{order.total | currency}}
-			</h3>
-			<mat-list-item>Items: {{order.subtotal | currency}}</mat-list-item>
-			<mat-list-item>Shipping: {{order.shipping | currency}}</mat-list-item>
-			<mat-list-item>Tax: {{order.tax | currency}}</mat-list-item>
-	</mat-list>
-
 	<div  *ngIf="showOrder">
-			<h4>
-				Items
-			</h4>
-			<mat-list>
-				<mat-list-item *ngFor="let item of order.items">			
-					<h4 mat-line>{{item.productName}}</h4>
-					<p mat-line>
-						<span class="item-count">{{item.count}}</span>
-						<span class="item-color">{{item.colorName}}</span> - <span class="item-size">{{item.sizeName}}</span>
-					</p>
-				</mat-list-item>
-			</mat-list>
-			<p>
-				<a href="https://www.jinx.com/help" target="_blank">Help</a>
-			</p>
+		<table class="order-totals-table">
+			<tr>
+				<td>Items:</td>
+				<td>{{order.subtotal | currency}}</td>
+			</tr>
+			<tr>
+				<td>Shipping:</td>
+				<td>{{order.shippingMethod.price | currency}}</td>
+			</tr>
+			<tr *ngIf="order.tax > 0">
+				<td>Tax:</td>
+				<td>{{order.tax | currency}}</td>
+			</tr>
+			<tr *ngIf="order.discounts != 0">
+				<td>Discounts:</td>
+				<td>{{order.discounts | currency}}</td>
+			</tr>
+			<tr class="grand-total">
+				<td>Total:</td>
+				<td>{{order.total | currency}}</td>
+			</tr>
+		</table>
+		<p>
+			<a href="https://www.jinx.com/help" target="_blank">Help</a>
+		</p>		
+		<app-order-item-list></app-order-item-list>
 	</div>
 </div>

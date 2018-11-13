@@ -1,0 +1,12 @@
+
+<table class="order-items-table" *ngIf="order != null">
+  <tr *ngFor="let item of order.items">
+    <td>
+      <app-product-image [imageFolder]="getPhotoStub(item)" size="100"></app-product-image>
+    </td>
+    <td>
+        {{item.sizeName}}<br />
+        {{item.count}} x {{item.price | currency}}
+    </td>
+  </tr>
+</table>

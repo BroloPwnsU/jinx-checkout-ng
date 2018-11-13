@@ -58,7 +58,10 @@ export class CheckoutComponent implements OnInit {
 	amazonPayWalletWidgetLoaded: boolean = false;
 	amazonPayLoginButtonLoaded: boolean = false;
 
+	selectedShippingMethod: ShippingMethod;
 	finalOrder: Order;
+
+	showTesting: boolean = false;
 
 	private startPage(): void {
 		this.grabToken();
@@ -251,10 +254,13 @@ export class CheckoutComponent implements OnInit {
 		this.finalOrder = null;
 		this.showRates = false;
 
+		this.selectedShippingMethod = method;
+
 		//Apply the selected shipping method to the order
 		this.orderService.setShippingMethod(method).subscribe(
 			(order) => {
 				this.finalOrder = order;
+				this.selectedShippingMethod = order.shippingMethod;
 			},
 			(error) => {
 				this.criticalError(error);
@@ -376,6 +382,10 @@ export class CheckoutComponent implements OnInit {
 
 		this.showCheckoutError = true;
 		this.checkoutErrorMessage = (displayMessage != null) ? displayMessage : this.tryAgainMessage;
+	}
+
+	toggleTesting(): void {
+		this.showTesting = !this.showTesting;
 	}
 
 	constructor(

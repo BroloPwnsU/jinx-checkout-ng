@@ -1,59 +1,88 @@
-<p>
-	<button mat-stroked-button (click)="logoutAmazonPay()">Logout from Amazon Pay <mat-icon>no_encryption</mat-icon></button>
-</p>
+<app-checkout-header></app-checkout-header>
 <div *ngIf="showCriticalError == false">
 
-	<div id="addressBookWidgetDiv"></div>
-	<div id="walletWidgetDiv"></div>
+	<div id="addressBookWidgetDiv" class="amazon-widget"></div>
+	<div id="walletWidgetDiv" class="amazon-widget"></div>
+
 	<div *ngIf="showCheckoutError" class="checkout-error">
 		<span>{{checkoutErrorMessage}}</span>
 	</div>
 
 	<div *ngIf="addressSelected">
 
+		<h3>Shipping Method</h3>
 		<div *ngIf="ratesLoaded == false && ratesError == false">
-			<app-loading-panel [message]="'Loading Shipping Rates...'"></app-loading-panel>
+			<app-loading-panel [showMessage]="false"></app-loading-panel>
 		</div>
-
-		<div *ngIf="ratesLoaded && showRates">
-			<h3>Choose Shipping Method</h3>
-			<div *ngFor="let method of rates">
-				<h4>
+		<table class="shipping-methods" *ngIf="ratesLoaded && showRates">
+			<tr *ngFor="let method of rates">
+				<td>
+					<span class="shipping-name">{{method.name}}</span><br/>
+					<span *ngIf="method.minDeliveryDays != method.maxDeliveryDays" class="shipping-days">{{method.minDeliveryDays}} - {{method.maxDeliveryDays}} business days</span>
+					<span *ngIf="method.minDeliveryDays == method.maxDeliveryDays" class="shipping-days">{{method.minDeliveryDays}} business day(s)</span>
+				</td>
+				<td>
 					<button mat-flat-button color="primary" (click)="selectShippingMethod(method)" class="shipping-button" >
-						{{method.name}}
+						{{method.price | currency}}
 					</button>
-					<span class="shipping-price">{{method.price | currency}}</span>
-				</h4>
-			</div>
-		</div>
+				</td>
+			</tr>
+		</table>
 		
-		<div *ngIf="ratesLoaded && rateSelected && showRates == false && finalOrder != null">
-			<h3>Selected Shipping Method</h3>
-			<span>{{finalOrder.shippingMethod.name}} - {{finalOrder.shippingMethod.price | currency}}</span>
-			<button mat-button color="primary" (click)="changeShippingMethod()" class="change-shipping">Change</button>
-		</div>
+		<table class="shipping-methods" *ngIf="ratesLoaded && rateSelected && showRates == false && selectedShippingMethod != null">
+			<tr>
+				<td>
+					<span class="shipping-name">{{selectedShippingMethod.name}}</span><br/>
+					<span *ngIf="selectedShippingMethod.minDeliveryDays != selectedShippingMethod.maxDeliveryDays" class="shipping-days">{{selectedShippingMethod.minDeliveryDays}} - {{selectedShippingMethod.maxDeliveryDays}} business days</span>
+					<span *ngIf="selectedShippingMethod.minDeliveryDays == selectedShippingMethod.maxDeliveryDays" class="shipping-days">{{selectedShippingMethod.minDeliveryDays}} business day(s)</span>
+				</td>
+				<td>
+					<button mat-stroked-button color="primary" (click)="changeShippingMethod()" class="shipping-button">Change</button>
+				</td>
+			</tr>
+		</table>
 	</div>
 
 	<div *ngIf="rateSelected && paymentSelected && addressSelected">
 		<hr />
-		<app-loading-panel *ngIf="finalOrder == null" [message]="'Calculating Totals...'"></app-loading-panel>
+		<div *ngIf="finalOrder == null">
+			<h3>Getting Order Total</h3>
+			<app-loading-panel [showMessage]="false"></app-loading-panel>
+		</div>
 		<div *ngIf="finalOrder != null">
 			<h3>Confirm Your Order</h3>
-			<p>Shipping: {{finalOrder.shippingMethod.price | currency}} ({{finalOrder.shippingMethod.name}})</p>
-			<p>Items: {{finalOrder.count}} for {{finalOrder.subtotal | currency}}
-			<p>Tax: {{finalOrder.tax | currency}}</p>
-			<p>Discounts: {{finalOrder.discounts | currency}}</p>
-			<p>Total: {{finalOrder.total | currency}}</p>
+			<table class="order-totals-table">
+				<tr>
+					<td>Items:</td>
+					<td>{{finalOrder.subtotal | currency}}</td>
+				</tr>
+				<tr>
+					<td>Shipping:</td>
+					<td>{{finalOrder.shippingMethod.price | currency}}</td>
+				</tr>
+				<tr *ngIf="finalOrder.tax > 0">
+					<td>Tax:</td>
+					<td>{{finalOrder.tax | currency}}</td>
+				</tr>
+				<tr *ngIf="finalOrder.discounts != 0">
+					<td>Discounts:</td>
+					<td>{{finalOrder.discounts | currency}}</td>
+				</tr>
+				<tr class="grand-total">
+					<td>Total:</td>
+					<td>{{finalOrder.total | currency}}</td>
+				</tr>
+			</table>
 			<div class="place-order" *ngIf="placingOrder == false">
 				<button mat-flat-button color="primary" (click)="confirmOrder()">Place Order</button>
 			</div>
 			<app-loading-panel *ngIf="placingOrder" [message]="'Confirming Payment...'"></app-loading-panel>
 		</div>
-		<div>Order Ref ID: {{orderReferenceId}}</div>
 	</div> 
 
 	<div *ngIf="preLoadComplete == false">
-		<app-loading-panel [message]="'Loading Order Data...'"></app-loading-panel>
+		<h3>Loading Order Data</h3>
+		<app-loading-panel [showMessage]="false"></app-loading-panel>
 	</div>
 	
 </div>
@@ -61,15 +90,21 @@
 	{{criticalErrorMessage}}
 </div>
 
-<hr />
-<p>
-	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
-	<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a> <br />
-</p>
-<app-error-fake></app-error-fake>
-<p>
-	Error Test<br />
-	<button (click)="errorTest(0)">No Error</button><br />
-	<button (click)="errorTest(1)">Unauthorized</button><br />
-	<button (click)="errorTest(2)">Bad Request</button>
-</p>
+<button mat-button (click)="toggleTesting()" >...</button>
+<div *ngIf="showTesting" class="testing-panel">
+	<div class="reference-panel">
+		Amazon Pay Order Reference ID<br />
+		<span>{{orderReferenceId}}</span>
+	</div>
+	<p>
+		<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />
+		<a href="/start?cart=66245:1;65705:1;68041:1;64008:1;68041:1;65704:1&token=TOKENOFDOOM&userid=1234567890ABCDEFG&channelid=999999999">TEST: Start with Parameters</a> <br />
+	</p>
+	<app-error-fake></app-error-fake>
+	<p>
+		Error Test<br />
+		<button (click)="errorTest(0)">No Error</button><br />
+		<button (click)="errorTest(1)">Unauthorized</button><br />
+		<button (click)="errorTest(2)">Bad Request</button>
+	</p>
+</div>

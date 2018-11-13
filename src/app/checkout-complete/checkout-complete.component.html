@@ -1,6 +1,4 @@
-<div>
-	<button mat-stroked-button (click)="logoutAmazonPay()">Logout from Amazon Pay <mat-icon>no_encryption</mat-icon></button>
-</div>
+<app-checkout-header></app-checkout-header>
 <h2>
 	Checkout Complete!
 	<button mat-flat-button color="primary" (click)="closeWindow()">Close</button>
@@ -9,7 +7,6 @@
 	<app-order-detail *ngFor="let order of orderList" [order]="order"></app-order-detail>
 </div>
 <app-loading-panel *ngIf="listLoaded == false"></app-loading-panel>
-
 <hr />
 <p>
 	<a routerLink="/start" routerLinkActive="active">Start Over</a> <br />

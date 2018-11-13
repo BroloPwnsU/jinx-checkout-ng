@@ -22,6 +22,8 @@ export class CheckoutStartComponent implements OnInit {
 	isError: boolean = false;
 	errorMessage: string = "";
 	defaultCriticalMessage: string = "Checkout has suffered a critical error. Please close the Checkout window and try again.";
+	showTesting: boolean = false;
+	order: Order;
 
 	showAmazonPayButton(): void {
 		this.amazonPayService.getIsLoaded().subscribe(
@@ -66,6 +68,7 @@ export class CheckoutStartComponent implements OnInit {
 			this.orderService.getOrder().subscribe(
 				(order) => {
 					if (order != null) {
+						this.order = order;
 						this.messageService.debug("Order found in memory. Showing APAY.");
 						this.isError = false;
 						this.showAmazonPayButton();
@@ -89,6 +92,7 @@ export class CheckoutStartComponent implements OnInit {
 				(validOrder) => {
 					if (validOrder != null) {
 						//Order is valid. Let's do it. Go to amazon pay now.
+						this.order = validOrder;
 						this.loading = false;
 						this.isError = false;
 						this.showAmazonPayButton();
@@ -148,6 +152,10 @@ export class CheckoutStartComponent implements OnInit {
 
 		this.isError = true;
 		this.errorMessage = (displayMessage != null) ? displayMessage : this.defaultCriticalMessage;
+	}
+
+	toggleTesting(): void {
+		this.showTesting = !this.showTesting;
 	}
 
 /*
