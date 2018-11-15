@@ -1,12 +1,13 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { TwitchAuth } from '../classes/twitch-auth';
+import { Order } from '../classes/order';
+
 import { MessageService } from '../services/message.service';
 import { AmazonPayService } from '../services/amazon-pay.service';
-import { TwitchAuth } from '../classes/twitch-auth';
 import { UserService } from '../services/user.service';
 import { OrderService } from '../services/order.service';
-import { Order } from '../classes/order';
 
 declare var OffAmazonPayments: any;
 declare var amazon: any;

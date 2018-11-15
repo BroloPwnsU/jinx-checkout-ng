@@ -3,13 +3,12 @@ import {Router, ActivatedRoute, Params} from '@angular/router';
 import {Observable, Subject} from 'rxjs';
 
 import {MessageService} from '../services/message.service';
-import {UserService} from '../services/user.service'; 
+import {UserService} from '../services/user.service';
 import {AmazonPayService} from '../services/amazon-pay.service';
 import {OrderService} from '../services/order.service';
 
 import {ShippingMethod} from '../classes/shipping-method';
 import {Order} from '../classes/order';
-import {OrderErrorState} from '../classes/order-error-state';
 
 
 declare var OffAmazonPayments: any;
@@ -22,7 +21,7 @@ declare var amazon: any;
 })
 export class CheckoutComponent implements OnInit {
 
-	popupAmazonPay: boolean = true;
+    private popupAmazonPay: boolean = true;
 
 	preLoadComplete: boolean = false;
 	
@@ -40,7 +39,7 @@ export class CheckoutComponent implements OnInit {
 	addressMissingMessage: string = "Please provide a valid shipping address.";
 	addressInvalidMessage: string = "We can not ship to your address. Please provide a different address and try again.";
 
-	orderReferenceId: string;
+    orderReferenceId: string;
 
 	referenceIdSet: boolean = false;
 	private referenceIdSubject = new Subject<boolean>();
