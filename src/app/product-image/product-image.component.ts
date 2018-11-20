@@ -20,6 +20,10 @@ export class ProductImageComponent implements OnInit, OnChanges {
     this.renderImage();
   }
 
+  getImageUrl(): string {
+    return `${this.imageFolder}${this.size}.jpg`;
+  }
+
   renderImage(): void {
     this.messageService.debug("Product Image changing.");
     this.imageLoaded = false;
@@ -28,10 +32,10 @@ export class ProductImageComponent implements OnInit, OnChanges {
     if (this.imageFolder == null || this.size == null) {
       this.messageService.debug("Product Image failed.");
       this.imageFailed = true;
-      this.imageLoaded = false;
+      this.imageLoaded = false; 
     }
     else {
-      var url = `${this.imageFolder}${this.size}.jpg`;
+      var url = this.getImageUrl();
       var productImage = new Image();
       productImage.src = url;
 

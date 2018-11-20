@@ -8,9 +8,12 @@ describe('MessagesComponent', () => {
   let fixture: ComponentFixture<MessagesComponent>;
 
   beforeEach(async(() => {
+
+    let messageService = jasmine.createSpyObj("MessageService", ["loadNotifications", "clear"]);
+
     TestBed.configureTestingModule({
       declarations: [ MessagesComponent ]
-      , providers: [MessageService]
+      , providers: [ { provide: MessageService, useValue: messageService } ]
     })
     .compileComponents();
   }));
@@ -19,9 +22,5 @@ describe('MessagesComponent', () => {
     fixture = TestBed.createComponent(MessagesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

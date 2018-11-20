@@ -1,13 +1,13 @@
 <div class="testing-panel">
   <button mat-button (click)="toggleMessages()">Messages</button>
-  <div *ngIf="messageService.notifications.length && showMessages">
+  <div *ngIf="notifications.length && showMessages">
     <hr />
     <p>
-      <button class="clear" (click)="messageService.clear()">clear</button>
+      <button class="clear" (click)="clear()">clear</button>
     </p>
     
     <ul>
-      <li *ngFor='let message of messageService.notifications' [class.error]="message.isError"> {{message.message}} </li>
+      <li *ngFor='let message of notifications' [class.error]="message.isError"> {{message.message}} </li>
     </ul>
   </div>
 </div>

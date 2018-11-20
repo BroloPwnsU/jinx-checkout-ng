@@ -10,12 +10,14 @@ describe('ErrorFakeComponent', () => {
   let fixture: ComponentFixture<ErrorFakeComponent>;
 
   beforeEach(async(() => {
+
+    let orderService = jasmine.createSpyObj("OrderService", ["setErrorFake"]);
+    let orderServiceSetErrorFake = orderService.setErrorFake;
+
     TestBed.configureTestingModule({
       declarations: [ ErrorFakeComponent ]
       , schemas: [ NO_ERRORS_SCHEMA ]
-      , providers: [ OrderService
-        //        { provide: TwainService, useValue: twainService }
-      ]
+      , providers: [ {provide: OrderService, useValue: orderService} ]
     })
     .compileComponents();
   }));
@@ -24,9 +26,5 @@ describe('ErrorFakeComponent', () => {
     fixture = TestBed.createComponent(ErrorFakeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

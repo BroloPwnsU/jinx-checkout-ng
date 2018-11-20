@@ -14,6 +14,13 @@ describe('CheckoutCompleteComponent', () => {
   let fixture: ComponentFixture<CheckoutCompleteComponent>;
 
   beforeEach(async(() => {
+
+    let userService = jasmine.createSpyObj("UserService", ["logoutAmazonPay"]);
+    let userServiceLogoutAmazonPay = userService.logoutAmazonPay;
+
+    let historyService = jasmine.createSpyObj("HistoryService", ["getAll"]);
+    let historyServiceGetAll = historyService.getAll;
+
     TestBed.configureTestingModule({
       declarations: [ 
         CheckoutCompleteComponent
@@ -22,8 +29,8 @@ describe('CheckoutCompleteComponent', () => {
         , CheckoutHeaderComponent
        ]
        , providers: [
-         HistoryService
-         , UserService
+         {provide: HistoryService, useValue: historyService}
+         , {provide: UserService, useValue: userService}
        ]
        , imports: [HttpClientModule]
        , schemas: [ NO_ERRORS_SCHEMA ]
@@ -35,9 +42,5 @@ describe('CheckoutCompleteComponent', () => {
     fixture = TestBed.createComponent(CheckoutCompleteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

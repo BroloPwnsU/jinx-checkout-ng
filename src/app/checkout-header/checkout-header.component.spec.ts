@@ -12,12 +12,15 @@ describe('CheckoutHeaderComponent', () => {
   let component: CheckoutHeaderComponent;
   let fixture: ComponentFixture<CheckoutHeaderComponent>;
 
+  let userService = jasmine.createSpyObj("UserService", ["logoutAmazonPay"]);
+  let userServiceLogoutAmazonPay = userService.logoutAmazonPay;
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ CheckoutHeaderComponent ]
       , imports: [MatButtonModule, MatIconModule, RouterModule, HttpClientModule]
       , schemas: [ NO_ERRORS_SCHEMA ]
-      , providers: [ UserService ]
+      , providers: [ {provide: UserService, useValue: userService} ]
     })
     .compileComponents();
   }));
@@ -26,9 +29,5 @@ describe('CheckoutHeaderComponent', () => {
     fixture = TestBed.createComponent(CheckoutHeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 });

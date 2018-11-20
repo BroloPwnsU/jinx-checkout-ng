@@ -3,31 +3,47 @@ import {OrderErrorState} from './order-error-state';
 import {ShippingMethod} from './shipping-method';
 
 export class Order {
-	
-	isError: boolean = false;
 
+	constructor() {
+		//empty constructor
+	}
+
+	load(otherOrder) {
+		this.isError = otherOrder.isError;
+		this.statusCode = otherOrder.statusCode;
+		this.errorState = otherOrder.errorState;
+		this.logMessage = otherOrder.logMessage;
+		this.confirmDate = otherOrder.confirmDate;
+		this.confirmDateObj = otherOrder.confirmDateObj;
+		this.count = otherOrder.count;
+		this.discounts = otherOrder.discounts;
+		this.total = otherOrder.total;
+		this.subtotal = otherOrder.subtotal;
+		this.rates = otherOrder.shippingMethod;
+		this.tax = otherOrder.tax;
+		this.shipping = otherOrder.shipping;
+		this.accessToken = otherOrder.accessToken;
+		this.orderReferenceId = otherOrder.orderReferenceId;
+		this.logMessage = otherOrder.logMessage;
+	}
+
+	isError: boolean = false;
 	statusCode: number = 0;
 	errorState: OrderErrorState = new OrderErrorState();
 	logMessage: string = null;
-	
 	confirmDate: string = null;
 	confirmDateObj: Date = null;
-
 	items: OrderItem[] = [];
-
 	orderReferenceId: string;
 	accessToken: string;
 	guid: string;
-	
 	subtotal: number = 0;
 	shipping: number = 0;
 	tax: number = 0;
 	discounts: number = 0;
 	total: number = 0;
 	count: number = 0;
-
 	shippingMethod: ShippingMethod;
-
 	rates: ShippingMethod[];
 
 	resetOrder(): void {
