@@ -40,6 +40,22 @@ describe('OrderItemListComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(OrderItemListComponent);
     component = fixture.componentInstance;
+
+    let order = new Order();
+    order.orderReferenceId = '1234';
+
+    let orderItem0 = new OrderItem();
+    orderItem0.productId = 100;
+    orderItem0.colorId = 200; 
+    
+    let orderItem1 = new OrderItem();
+    orderItem1.productId = 100;
+    orderItem1.colorId = 200; 
+
+    order.items = [orderItem0, orderItem1];
+
+    component.order = order;
+
     fixture.detectChanges();
   });
 
@@ -47,15 +63,14 @@ describe('OrderItemListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should use OrderService', () => {
+  it('should use OrderService',
     (done: DoneFn) => {
-      let testOrder: Order;
+      let testOrder = new Order();
       testOrder.orderReferenceId = testOrderReferenceId;
       orderService.getOrder().subscribe(value => {
-        expect(value).toBe(testOrder);
+        expect(value).toEqual(testOrder);
         done();
       });
-    }
   });
 
   it('should make a good photo url', () => {

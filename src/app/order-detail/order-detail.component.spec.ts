@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { OrderItemListComponent } from '../order-item-list/order-item-list.component';
 import { ProductImageComponent } from '../product-image/product-image.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Order } from '../classes/order';
 
 describe('OrderDetailComponent', () => {
   let component: OrderDetailComponent;
@@ -22,6 +23,16 @@ describe('OrderDetailComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(OrderDetailComponent);
     component = fixture.componentInstance;
+
+    let order = new Order();
+    order.orderReferenceId = 'dude';
+
+    component.order = order;
+
     fixture.detectChanges();
+  });
+  
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 });

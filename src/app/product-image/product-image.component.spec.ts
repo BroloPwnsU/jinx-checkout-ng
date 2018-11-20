@@ -27,4 +27,17 @@ describe('ProductImageComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should make good urls', () => {
+    component.imageFolder = 'https://mock/whatever/';
+    component.size = '200';
+
+    expect(component.getImageUrl()).toBe(
+      'https://mock/whatever/200.jpg'
+    );
+  });
 });

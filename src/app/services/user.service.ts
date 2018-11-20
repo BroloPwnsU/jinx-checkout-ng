@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import {MessageService} from './message.service';
 import {TwitchAuth} from '../classes/twitch-auth';
 
-declare var OffAmazonPayments: any;
 declare var amazon: any;
 
 @Injectable({
@@ -17,17 +16,8 @@ export class UserService  {
 
 	accessToken: string;
 	accessTokenStorageKey: string = 'app-access-token';
-
-    isUserAuthenticated(): boolean {
-        if (this.userAuth != null
-            && this.userAuth.token != null)
-        {
-            return true;
-        }
-        return false;
-    }
 	
-	loadTwitchAuth(theKey: string): TwitchAuth {
+	private loadTwitchAuth(theKey: string): TwitchAuth {
 		let obj = JSON.parse(this.loadSomething(theKey));
 		
 		if (obj != null) {
@@ -46,17 +36,20 @@ export class UserService  {
 		this.storeSomething(theKey, theString);
 	}
 
-	loadSomething(theKey: string): string {
-		return localStorage.getItem(theKey);
+	private loadSomething(theKey: string): string {
+		return sessionStorage.getItem(theKey);
 	}
 
-	storeSomething(theKey: string, theString: string): void {
-		localStorage.setItem(theKey, theString);
+	private storeSomething(theKey: string, theString: string): void {
+		sessionStorage.setItem(theKey, theString);
+	}
+
+	clearStorage(): void {
+		sessionStorage.clear();
 	}
 		
 	logoutAmazonPay(): void {
-
-		localStorage.clear();
+		this.clearStorage();
 
 		amazon.Login.logout();
 		document.cookie = "amazon_Login_accessToken=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
@@ -85,9 +78,9 @@ export class UserService  {
         this.userAuth = userAuth;
 		this.storeTwitchAuth(this.userAuthStorageKey, this.userAuth);
 
-        this.messageService.add(`Set Twitch user userId(${userAuth.userId})`);
-        this.messageService.add(`Set Twitch user token(${userAuth.token})`);
-        this.messageService.add(`Set Twitch user channelId(${userAuth.channelId})`);
+        this.messageService.debug(`Set Twitch user userId(${userAuth.userId})`);
+        this.messageService.debug(`Set Twitch user token(${userAuth.token})`);
+        this.messageService.debug(`Set Twitch user channelId(${userAuth.channelId})`);
     }
 
     getUserAuth(): TwitchAuth {
